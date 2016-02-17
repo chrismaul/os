@@ -1,5 +1,6 @@
-hostname: rancher
 rancher:
+  environment:
+    RESIZE_DEV: /dev/sda
   bootstrap:
     state-script:
       image: rancher/os-statescript:v0.4.3
@@ -320,6 +321,19 @@ rancher:
       - all-volumes
       volumes:
       - /sys/fs/cgroup:/host/sys/fs/cgroup
+    resizefs:
+      image: rancher/os-resizefs:v0.4.3
+      environment:
+      - RESIZE_DEV
+      - FORCE=true
+      privileged: true
+      labels:
+        io.rancher.os.detach: "false"
+        io.rancher.os.scope: system
+        io.rancher.os.before: console
+      volumes:
+      - /var/log:/var/log
+
   system_docker:
     args: [daemon, --log-opt, max-size=25m, --log-opt, max-file=2, -s, overlay, -b, docker-sys,
       --fixed-cidr, 172.18.42.1/16, --restart=false, -g, /var/lib/system-docker, -G, root,
